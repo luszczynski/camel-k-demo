@@ -1,0 +1,47 @@
+= Camel K Demo
+
+== Demo
+
+=== Deploy Camel K Operator
+
+=== Create a new project
+
+=== OpenShift login
+
+oc login ...
+
+=== Run Kamel
+
+[source,bash]
+----
+kamel init HelloCamelK.java
+kamel init hello-camel-k.xml
+kamel init hello.camelk.yaml
+
+kamel run HelloCamelK.java --dev
+kamel get
+kamel log hello
+----
+
+=== Deploy mailhog
+
+image: mailhog/mailhog
+port: 8025
+
+=== Kamel and Kafka
+
+[source,bash]
+----
+from("kafka:my-topic?brokers=my-cluster-kafka-bootstrap.teste.svc:9092&groupId=new-group&autoOffsetReset=earliest")
+    .routeId("kafka")
+    .convertBodyTo(String.class)
+    .log("body = ${body}")
+    .to("smtp://mailhog:1025?to=gustavo@redhat.com");
+----
+
+=== Send message to topic
+
+[source,bash]
+----
+kubectl -n debezium-demo run kafka-producer-topic1 -it --image=strimzi/kafka:0.20.1-kafka-2.6.0 --rm=true --restart=Never -- bin/kafka-console-producer.sh --broker-list my-cluster-kafka-bootstrap.debezium-demo.svc:9092 --topic my-topic
+----
